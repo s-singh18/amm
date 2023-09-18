@@ -7,7 +7,7 @@ import config from "../config.json";
 
 import { setContracts, setSymbols, balancesLoaded } from "./reducers/tokens";
 
-import { setContract } from "./reducers/amm";
+import { setContract, sharesLoaded } from "./reducers/amm";
 
 export const loadProvider = (dispatch) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -41,7 +41,7 @@ export const loadTokens = async (provider, chainId, dispatch) => {
   );
 
   const usd = new ethers.Contract(
-    config[chainId].dapp.address,
+    config[chainId].usd.address,
     TOKEN_ABI,
     provider
   );
@@ -56,22 +56,23 @@ export const loadAMM = async (provider, chainId, dispatch) => {
     AMM_ABI,
     provider
   );
-
-  const usd = new ethers.Contract(
-    config[chainId].dapp.address,
-    TOKEN_ABI,
-    provider
-  );
-
   dispatch(setContract(amm));
   return amm;
 };
 
 // -----------------------------------------------------------
 // LOAD BALANCES & SHARES
-export const loadBalances = async (tokens, account, dispatch) => {
+export const loadBalances = async (amm, tokens, account, dispatch) => {
   const balance1 = await tokens[0].balanceOf(account);
   const balance2 = await tokens[1].balanceOf(account);
 
-  dispatch(balancesLoaded(balance1, balance2));
+  dispatch(
+    balancesLoaded([
+      ethers.utils.formatUnits(balance1.toString(), "ether"),
+      ethers.utils.formatUnits(balance2.toString(), "ether"),
+    ])
+  );
+
+  const shares = await amm.shares(account);
+  dispatch(sharesLoaded(ethers.utils.formatUnits(shares.toString(), "ether")));
 };

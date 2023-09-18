@@ -31,8 +31,16 @@ function App() {
 
     const chainId = await loadNetwork(provider, dispatch);
 
+    window.ethereum.on("chainChanged", async () => {
+      window.location.reload();
+    });
+
     // Fetch accounts
-    await loadAccount(dispatch);
+    window.ethereum.on("accountsChanged", async () => {
+      console.log("account changed");
+      await loadAccount(dispatch);
+    });
+    // await loadAccount(dispatch);
 
     await loadTokens(provider, chainId, dispatch);
     await loadAMM(provider, chainId, dispatch);
@@ -44,7 +52,7 @@ function App() {
 
   return (
     <Container>
-      <Navigation account={"0x0..."} />
+      <Navigation />
 
       <h1 className="my-4 text-center">React Hardhat Template</h1>
 
