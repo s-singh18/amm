@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
@@ -12,9 +10,7 @@ import { ethers } from "ethers";
 
 import Alert from "./Alert";
 
-import { loadBalances, addLiquidity } from "../store/interactions";
-
-const account = null;
+import { addLiquidity, loadBalances } from "../store/interactions";
 
 const Deposit = () => {
   const [token1Amount, setToken1Amount] = useState(0);
@@ -36,13 +32,13 @@ const Deposit = () => {
   const transactionHash = useSelector(
     (state) => state.amm.depositing.transactionHash
   );
-
   const dispatch = useDispatch();
 
   const amountHandler = async (e) => {
     if (e.target.id === "token1") {
       setToken1Amount(e.target.value);
 
+      // Fetch value from chain
       const _token1Amount = ethers.utils.parseUnits(e.target.value, "ether");
       const result = await amm.calculateToken2Deposit(_token1Amount);
       const _token2Amount = ethers.utils.formatUnits(
@@ -54,14 +50,15 @@ const Deposit = () => {
     } else {
       setToken2Amount(e.target.value);
 
+      // Fetch value from chain
       const _token2Amount = ethers.utils.parseUnits(e.target.value, "ether");
-      const result = await amm.calculateToken2Deposit(_token2Amount);
+      const result = await amm.calculateToken1Deposit(_token2Amount);
       const _token1Amount = ethers.utils.formatUnits(
         result.toString(),
         "ether"
       );
 
-      setToken2Amount(_token1Amount);
+      setToken1Amount(_token1Amount);
     }
   };
 
@@ -109,13 +106,14 @@ const Deposit = () => {
                   value={token1Amount === 0 ? "" : token1Amount}
                 />
                 <InputGroup.Text
-                  style={{ width: "100px " }}
+                  style={{ width: "100px" }}
                   className="justify-content-center"
                 >
                   {symbols && symbols[0]}
                 </InputGroup.Text>
               </InputGroup>
             </Row>
+
             <Row className="my-3">
               <Form.Text className="text-end my-2" muted>
                 Balance: {balances[1]}
@@ -130,7 +128,7 @@ const Deposit = () => {
                   value={token2Amount === 0 ? "" : token2Amount}
                 />
                 <InputGroup.Text
-                  style={{ width: "100px " }}
+                  style={{ width: "100px" }}
                   className="justify-content-center"
                 >
                   {symbols && symbols[1]}
@@ -154,7 +152,7 @@ const Deposit = () => {
             className="d-flex justify-content-center align-items-center"
             style={{ height: "300px" }}
           >
-            Please Connect Wallet
+            Please connect wallet.
           </p>
         )}
       </Card>
