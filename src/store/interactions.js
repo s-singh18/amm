@@ -16,6 +16,9 @@ import {
   depositFail,
   depositRequest,
   depositSuccess,
+  withdrawFail,
+  withdrawRequest,
+  withdrawSuccess,
 } from "./reducers/amm";
 
 export const loadProvider = (dispatch) => {
@@ -86,8 +89,8 @@ export const loadBalances = async (amm, tokens, account, dispatch) => {
   dispatch(sharesLoaded(ethers.utils.formatUnits(shares.toString(), "ether")));
 };
 
-// -----------------------------------------------------------
-// ADD LIQUIDITY
+// ------------------------------------------------------------------------------
+// ADD LIQUDITY
 export const addLiquidity = async (
   provider,
   amm,
@@ -119,7 +122,24 @@ export const addLiquidity = async (
 
     dispatch(depositSuccess(transaction.hash));
   } catch (error) {
-    dispatch(depositFail);
+    dispatch(depositFail());
+  }
+};
+
+// ------------------------------------------------------------------------------
+// REMOVE LIQUDITY
+export const removeLiquidity = async (provider, amm, shares, dispatch) => {
+  try {
+    dispatch(withdrawRequest());
+
+    const signer = await provider.getSigner();
+
+    let transaction = await amm.connect(signer).removeLiquidity(shares);
+    await transaction.wait();
+
+    dispatch(withdrawSuccess(transaction.hash));
+  } catch (error) {
+    dispatch(withdrawFail());
   }
 };
 
