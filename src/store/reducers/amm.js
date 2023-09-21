@@ -29,6 +29,9 @@ export const amm = createSlice({
     sharesLoaded: (state, action) => {
       state.shares = action.payload;
     },
+    swapsLoaded: (state, action) => {
+      state.swaps = action.payload;
+    },
     swapRequest: (state, action) => {
       state.swapping.isSwapping = true;
       state.swapping.isSuccess = false;
@@ -80,6 +83,7 @@ export const amm = createSlice({
 export const {
   setContract,
   sharesLoaded,
+  swapsLoaded,
   swapRequest,
   swapSuccess,
   swapFail,
