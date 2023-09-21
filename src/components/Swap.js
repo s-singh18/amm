@@ -12,7 +12,7 @@ import { ethers } from "ethers";
 
 import Alert from "./Alert";
 
-import { swap, loadBalances } from "../store/interactions";
+import { swap, loadBalances, addLiquidity } from "../store/interactions";
 import provider from "../store/reducers/provider";
 
 const Swap = () => {
